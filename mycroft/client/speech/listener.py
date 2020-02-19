@@ -190,19 +190,22 @@ class AudioConsumer(Thread):
 
     # TODO: Localization
     def process(self, audio):
-        settings_file = open("set_config.txt", 'w')
+        settings_file = open("/home/insitelabdev/mycroft-core/mycroft/client/speech/set_config.txt", 'w')
         
         if self._audio_length(audio) >= self.MIN_AUDIO_SIZE:
             stopwatch = Stopwatch()
             with stopwatch:
                 transcription = self.transcribe(audio) 
+            
+            settings = {"rate": "  '1.0'  "}
             #ana added this
-            # if "quickly" in transcription:
-            LOG.info("******WE ARE INSIDE PROCESS: " + transcription)
-            settings = {"rate": "  '1.6'  "}
+            if "quickly" in transcription:
+                LOG.info("******WE ARE INSIDE PROCESS: " + transcription)
+                settings["rate"] = "  '1.6'  "
+                LOG.info("******THIS IS NOW THE SETTINGS: " + settings["rate"])
+
             settings_file.write(str(settings))
             settings_file.close()
-            LOG.info("******THIS IS NOW THE SETTINGS: " + settings["rate"])
 
             if transcription:
                 ident = str(stopwatch.timestamp) + str(hash(transcription))
