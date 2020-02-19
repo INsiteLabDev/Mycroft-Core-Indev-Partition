@@ -25,6 +25,11 @@ from mycroft.messagebus.message import Message
 from mycroft.tts.remote_tts import RemoteTTSTimeoutException
 from mycroft.tts.mimic_tts import Mimic
 
+#ana added this
+from mycroft.client.speech import listener
+
+
+
 bus = None  # Mycroft messagebus connection
 config = None
 tts = None
@@ -34,12 +39,13 @@ mimic_fallback_obj = None
 
 _last_stop_signal = 0
 
-
 def handle_speak(event):
     """Handle "speak" message
-
     Parse sentences and invoke text to speech service.
     """
+    #/home/insitelabdev/mycroft-core/mycroft/client/speech/set_config.txt
+    settings_file = open("/home/insitelabdev/mycroft-core/mycroft/client/speech/set_config.txt", 'r')
+    settings_dict = eval(settings_file.read())
     config = Configuration.get()
     Configuration.set_config_update_handlers(bus)
     global _last_stop_signal
@@ -84,7 +90,9 @@ def handle_speak(event):
                     tts.playback.clear()
                     break
                 try:
-                    mute_and_speak(chunk, ident, listen)
+                    #ana added this
+                    LOG.info("*******THIS IS THE SPEECH SPEED: "+ settings_dict["rate"])
+                    mute_and_speak( "<speak><prosody rate= " + settings_dict["rate"] + ">" + chunk + "</prosody></speak>", ident, listen)
                 except KeyboardInterrupt:
                     raise
                 except Exception:
@@ -96,10 +104,11 @@ def handle_speak(event):
     report_timing(ident, 'speech', stopwatch, {'utterance': utterance,
                                                'tts': tts.__class__.__name__})
 
+    settings_file.close()
+
 
 def mute_and_speak(utterance, ident, listen=False):
     """Mute mic and start speaking the utterance using selected tts backend.
-
     Arguments:
         utterance:  The sentence to be spoken
         ident:      Ident tying the utterance to the source query
@@ -142,7 +151,6 @@ def mimic_fallback_tts(utterance, ident, listen):
 
 def handle_stop(event):
     """Handle stop message.
-
     Shutdown any speech.
     """
     global _last_stop_signal
@@ -154,7 +162,6 @@ def handle_stop(event):
 
 def init(messagebus):
     """Start speech related handlers.
-
     Arguments:
         messagebus: Connection to the Mycroft messagebus
     """
@@ -178,7 +185,6 @@ def init(messagebus):
 
 def shutdown():
     """Shutdown the audio service cleanly.
-
     Stop any playing audio and make sure threads are joined correctly.
     """
     if tts:

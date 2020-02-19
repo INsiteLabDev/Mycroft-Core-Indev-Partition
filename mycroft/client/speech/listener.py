@@ -43,6 +43,9 @@ STREAM_START = 1
 STREAM_DATA = 2
 STREAM_STOP = 3
 
+#ana added this
+
+#settings_dict = eval(settings_file.read())
 
 class AudioStreamHandler(object):
     def __init__(self, queue):
@@ -140,6 +143,8 @@ class AudioConsumer(Thread):
         self.wakeword_recognizer = wakeword_recognizer
         self.metrics = MetricsAggregator()
 
+
+
     def run(self):
         while self.state.running:
             self.read()
@@ -185,11 +190,20 @@ class AudioConsumer(Thread):
 
     # TODO: Localization
     def process(self, audio):
-
+        settings_file = open("set_config.txt", 'w')
+        
         if self._audio_length(audio) >= self.MIN_AUDIO_SIZE:
             stopwatch = Stopwatch()
             with stopwatch:
-                transcription = self.transcribe(audio)
+                transcription = self.transcribe(audio) 
+            #ana added this
+            # if "quickly" in transcription:
+            LOG.info("******WE ARE INSIDE PROCESS: " + transcription)
+            settings = {"rate": "  '1.6'  "}
+            settings_file.write(str(settings))
+            settings_file.close()
+            LOG.info("******THIS IS NOW THE SETTINGS: " + settings["rate"])
+
             if transcription:
                 ident = str(stopwatch.timestamp) + str(hash(transcription))
                 # STT succeeded, send the transcribed speech on for processing
@@ -201,7 +215,6 @@ class AudioConsumer(Thread):
                 }
                 self.emitter.emit("recognizer_loop:utterance", payload)
                 self.metrics.attr('utterances', [transcription])
-
                 # Report timing metrics
                 report_timing(ident, 'stt', stopwatch,
                               {'transcription': transcription,
@@ -273,7 +286,6 @@ def recognizer_conf_hash(config):
 
 class RecognizerLoop(EventEmitter):
     """ EventEmitter loop running speech recognition.
-
     Local wake word recognizer and remote general speech recognition.
     """
 
@@ -310,13 +322,10 @@ class RecognizerLoop(EventEmitter):
 
     def create_wake_word_recognizer(self):
         """Create a local recognizer to hear the wakeup word
-
         For example 'Hey Mycroft'.
-
         The method uses the hotword entry for the selected wakeword, if
         one is missing it will fall back to the old phoneme and threshold in
         the listener entry in the config.
-
         If the hotword entry doesn't include phoneme and threshold values these
         will be patched in using the defaults from the config listnere entry.
         """
@@ -420,7 +429,6 @@ class RecognizerLoop(EventEmitter):
 
     def run(self):
         """Start and reload mic and STT handling threads as needed.
-
         Wait for KeyboardInterrupt and shutdown cleanly.
         """
         try:
