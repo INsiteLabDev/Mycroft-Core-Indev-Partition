@@ -92,7 +92,10 @@ def handle_speak(event):
                 try:
                     #ana added this
                     LOG.info("*******THIS IS THE SPEECH SPEED: "+ settings_dict["rate"])
-                    mute_and_speak( "<speak><prosody rate= " + settings_dict["rate"] + ">" + chunk + "</prosody></speak>", ident, listen)
+                    
+                    mute_and_speak( "<speak><prosody volume= " + settings_dict["volume"]
+                                    + " rate= " + settings_dict["rate"] + ">" + 
+                                    chunk + "</prosody></speak>", ident, listen)
                 except KeyboardInterrupt:
                     raise
                 except Exception:

@@ -197,11 +197,13 @@ class AudioConsumer(Thread):
             with stopwatch:
                 transcription = self.transcribe(audio) 
             
-            settings = {"rate": "  '1.0'  "}
+            settings = {"rate": "  '1.0'  ", "volume": " '70%' "}
             #ana added this
             if "quickly" in transcription:
-                LOG.info("******WE ARE INSIDE PROCESS: " + transcription)
                 settings["rate"] = "  '1.6'  "
+                LOG.info("******THIS IS NOW THE SETTINGS: " + settings["rate"])
+            if "loudly" in transcription:
+                settings["volume"] = "  '100%'  "
                 LOG.info("******THIS IS NOW THE SETTINGS: " + settings["rate"])
 
             settings_file.write(str(settings))
