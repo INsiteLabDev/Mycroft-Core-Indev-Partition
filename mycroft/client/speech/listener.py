@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+import pathlib
 import time
 from threading import Thread
 import speech_recognition as sr
@@ -190,14 +192,15 @@ class AudioConsumer(Thread):
 
     # TODO: Localization
     def process(self, audio):
-        settings_file = open("/home/insitelabdev/mycroft-core/mycroft/client/speech/set_config.txt", 'w')
+        path = pathlib.Path().absolute()
+        settings_file = open(str(path)+'/mycroft/client/speech/set_config.txt', 'w')
         
         if self._audio_length(audio) >= self.MIN_AUDIO_SIZE:
             stopwatch = Stopwatch()
             with stopwatch:
                 transcription = self.transcribe(audio) 
             
-            settings = {"rate": "  '1.0'  ", "volume": " '100%' "}
+            settings = {"rate": "  '1.0'  ", "volume": " '80%' "}
             #speed
             if "quickly" in transcription:
                 settings["rate"] = "  '1.6'  "

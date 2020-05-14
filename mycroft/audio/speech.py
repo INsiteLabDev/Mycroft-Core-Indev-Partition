@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import pathlib
 import re
 import time
 from threading import Lock
@@ -44,7 +45,8 @@ def handle_speak(event):
     Parse sentences and invoke text to speech service.
     """
     #/home/insitelabdev/mycroft-core/mycroft/client/speech/set_config.txt
-    settings_file = open("/home/insitelabdev/mycroft-core/mycroft/client/speech/set_config.txt", 'r')
+    path = pathlib.Path().absolute()
+    settings_file = open(str(path)+'/mycroft/client/speech/set_config.txt', 'r')
     settings_dict = eval(settings_file.read())
     config = Configuration.get()
     Configuration.set_config_update_handlers(bus)
